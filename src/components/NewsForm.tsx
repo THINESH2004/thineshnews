@@ -1,18 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NewsFormData, NewsType, Language } from '@/types/template';
 import { NewsTypeSelector } from './NewsTypeSelector';
+import { TemplateStyleSelector } from './TemplateStyleSelector';
 import { ImageUploader } from './ImageUploader';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
+import { templateVariants } from '@/data/templateLayouts';
 import { 
-  Sparkles, Download, Send, MapPin, User, Calendar, Languages,
+  Sparkles, MapPin, User, Calendar, Languages,
   Wand2, RefreshCw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NewsFormProps {
-  onGenerate: (data: NewsFormData) => void;
+  onGenerate: (data: NewsFormData, variantId: string) => void;
   isGenerating: boolean;
 }
 
@@ -31,6 +33,15 @@ const initialData: NewsFormData = {
 
 export function NewsForm({ onGenerate, isGenerating }: NewsFormProps) {
   const [formData, setFormData] = useState<NewsFormData>(initialData);
+  const [selectedVariant, setSelectedVariant] = useState<string>('breaking-classic');
+
+  // Update variant when news type changes
+  useEffect(() => {
+    const variants = templateVariants[formData.newsType];
+    if (variants && variants.length > 0) {
+      setSelectedVariant(variants[0].id);
+    }
+  }, [formData.newsType]);
 
   const handleChange = <K extends keyof NewsFormData>(key: K, value: NewsFormData[K]) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -38,11 +49,12 @@ export function NewsForm({ onGenerate, isGenerating }: NewsFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onGenerate(formData);
+    onGenerate(formData, selectedVariant);
   };
 
   const handleReset = () => {
     setFormData(initialData);
+    setSelectedVariant('breaking-classic');
   };
 
   return (
@@ -51,6 +63,13 @@ export function NewsForm({ onGenerate, isGenerating }: NewsFormProps) {
       <NewsTypeSelector
         selected={formData.newsType}
         onChange={(type) => handleChange('newsType', type)}
+      />
+
+      {/* Template Style Selection */}
+      <TemplateStyleSelector
+        newsType={formData.newsType}
+        selectedVariant={selectedVariant}
+        onChange={setSelectedVariant}
       />
 
       {/* Language Toggle */}
