@@ -1,16 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { NewsFormData } from '@/types/template';
-import { templateLayouts } from '@/data/templateLayouts';
+import { templateVariants } from '@/data/templateLayouts';
 import { Button } from './ui/button';
 import { Download, Send, Maximize2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface TemplatePreviewProps {
   data: NewsFormData | null;
+  variantId: string;
   isGenerating: boolean;
 }
 
-export function TemplatePreview({ data, isGenerating }: TemplatePreviewProps) {
+export function TemplatePreview({ data, variantId, isGenerating }: TemplatePreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isRendered, setIsRendered] = useState(false);
 
@@ -21,7 +22,12 @@ export function TemplatePreview({ data, isGenerating }: TemplatePreviewProps) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const layout = templateLayouts[data.newsType];
+    // Find the layout from variants
+    const variants = templateVariants[data.newsType];
+    const variant = variants?.find(v => v.id === variantId) || variants?.[0];
+    if (!variant) return;
+
+    const layout = variant.layout;
     canvas.width = layout.width;
     canvas.height = layout.height;
 
@@ -32,8 +38,33 @@ export function TemplatePreview({ data, isGenerating }: TemplatePreviewProps) {
     // Draw gradient overlay
     if (layout.gradientOverlay) {
       const gradient = ctx.createLinearGradient(0, 0, layout.width, layout.height);
-      gradient.addColorStop(0, 'rgba(220,38,38,0.3)');
-      gradient.addColorStop(1, 'rgba(0,0,0,0.8)');
+      // Parse gradient colors based on type
+      if (layout.type === 'breaking') {
+        gradient.addColorStop(0, 'rgba(220,38,38,0.3)');
+        gradient.addColorStop(1, 'rgba(0,0,0,0.8)');
+      } else if (layout.type === 'sports') {
+        gradient.addColorStop(0, 'rgba(249,115,22,0.25)');
+        gradient.addColorStop(1, 'rgba(0,0,0,0.85)');
+      } else if (layout.type === 'weather') {
+        gradient.addColorStop(0, 'rgba(6,182,212,0.2)');
+        gradient.addColorStop(1, 'rgba(0,0,0,0.9)');
+      } else if (layout.type === 'political') {
+        gradient.addColorStop(0, 'rgba(139,92,246,0.2)');
+        gradient.addColorStop(1, 'rgba(0,0,0,0.9)');
+      } else if (layout.type === 'interview') {
+        gradient.addColorStop(0, 'rgba(59,130,246,0.2)');
+        gradient.addColorStop(1, 'rgba(0,0,0,0.9)');
+      } else if (layout.type === 'election') {
+        gradient.addColorStop(0, 'rgba(234,179,8,0.25)');
+        gradient.addColorStop(1, 'rgba(0,0,0,0.85)');
+      } else if (layout.type === 'special') {
+        gradient.addColorStop(0, 'rgba(220,38,38,0.2)');
+        gradient.addColorStop(1, 'rgba(0,0,0,0.9)');
+      } else if (layout.type === 'festival') {
+        gradient.addColorStop(0, 'rgba(234,179,8,0.3)');
+        gradient.addColorStop(0.5, 'rgba(220,38,38,0.2)');
+        gradient.addColorStop(1, 'rgba(0,0,0,0.8)');
+      }
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, layout.width, layout.height);
     }
@@ -41,135 +72,136 @@ export function TemplatePreview({ data, isGenerating }: TemplatePreviewProps) {
     // Process each element
     const imagePromises: Promise<void>[] = [];
 
-    layout.elements.forEach((element) => {
-      const value = element.binding ? data[element.binding] : element.content;
+    // Draw images first (they should be behind text)
+    layout.elements
+      .filter(el => el.type === 'image' || el.type === 'logo')
+      .forEach((element) => {
+        const value = element.binding ? data[element.binding] : null;
 
-      if (element.type === 'badge') {
-        // Draw badge background
-        ctx.fillStyle = element.style.backgroundColor || '#dc2626';
-        roundRect(ctx, element.x, element.y, element.width, element.height, element.style.borderRadius || 4);
-        ctx.fill();
+        if (element.type === 'image' && typeof value === 'string' && value) {
+          const promise = new Promise<void>((resolve) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+              ctx.save();
+              roundRect(ctx, element.x, element.y, element.width, element.height, element.style.borderRadius || 0);
+              ctx.clip();
+              
+              const scale = Math.max(element.width / img.width, element.height / img.height);
+              const scaledWidth = img.width * scale;
+              const scaledHeight = img.height * scale;
+              const offsetX = element.x + (element.width - scaledWidth) / 2;
+              const offsetY = element.y + (element.height - scaledHeight) / 2;
+              
+              ctx.drawImage(img, offsetX, offsetY, scaledWidth, scaledHeight);
+              ctx.restore();
+              resolve();
+            };
+            img.onerror = () => resolve();
+            img.src = value;
+          });
+          imagePromises.push(promise);
+        }
 
-        // Draw badge text
-        ctx.fillStyle = element.style.color || '#ffffff';
-        ctx.font = `${element.style.fontWeight || 'bold'} ${element.style.fontSize || 28}px ${element.style.fontFamily || 'Bebas Neue'}`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(
-          element.content || '',
-          element.x + element.width / 2,
-          element.y + element.height / 2
-        );
-      }
+        if (element.type === 'logo' && typeof value === 'string' && value) {
+          const promise = new Promise<void>((resolve) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+              const aspectRatio = img.width / img.height;
+              let drawWidth = element.width;
+              let drawHeight = element.height;
+              
+              if (aspectRatio > element.width / element.height) {
+                drawHeight = drawWidth / aspectRatio;
+              } else {
+                drawWidth = drawHeight * aspectRatio;
+              }
+              
+              ctx.drawImage(
+                img,
+                element.x + (element.width - drawWidth) / 2,
+                element.y + (element.height - drawHeight) / 2,
+                drawWidth,
+                drawHeight
+              );
+              resolve();
+            };
+            img.onerror = () => resolve();
+            img.src = value;
+          });
+          imagePromises.push(promise);
+        }
+      });
 
-      if (element.type === 'text' && typeof value === 'string') {
-        ctx.fillStyle = element.style.color || '#ffffff';
-        const fontSize = element.style.fontSize || 48;
-        ctx.font = `${element.style.fontWeight || 'bold'} ${fontSize}px ${element.style.fontFamily || 'Oswald'}`;
-        ctx.textAlign = (element.style.textAlign as CanvasTextAlign) || 'left';
-        ctx.textBaseline = 'top';
-
-        const text = element.style.textTransform === 'uppercase' ? value.toUpperCase() : value;
-        const lines = wrapText(ctx, text, element.width, element.style.maxLines || 3);
-        
-        lines.forEach((line, i) => {
-          const x = element.style.textAlign === 'center' 
-            ? element.x + element.width / 2 
-            : element.x;
-          ctx.fillText(line, x, element.y + i * (fontSize * 1.2));
-        });
-      }
-
-      if (element.type === 'ticker' && typeof value === 'string') {
-        // Draw ticker background
-        ctx.fillStyle = element.style.backgroundColor || '#dc2626';
-        ctx.fillRect(element.x, element.y, element.width, element.height);
-
-        // Draw ticker text
-        ctx.fillStyle = element.style.color || '#ffffff';
-        ctx.font = `${element.style.fontWeight || 'bold'} ${element.style.fontSize || 26}px ${element.style.fontFamily || 'Roboto'}`;
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'middle';
-        
-        const padding = element.style.padding || 20;
-        const tickerText = value.length > 150 ? value.substring(0, 147) + '...' : value;
-        ctx.fillText(tickerText, element.x + padding, element.y + element.height / 2);
-      }
-
-      if (element.type === 'image' && typeof value === 'string' && value) {
-        const promise = new Promise<void>((resolve) => {
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.onload = () => {
-            // Draw with rounded corners
-            ctx.save();
-            roundRect(ctx, element.x, element.y, element.width, element.height, element.style.borderRadius || 0);
-            ctx.clip();
-            
-            // Cover fit
-            const scale = Math.max(element.width / img.width, element.height / img.height);
-            const scaledWidth = img.width * scale;
-            const scaledHeight = img.height * scale;
-            const offsetX = element.x + (element.width - scaledWidth) / 2;
-            const offsetY = element.y + (element.height - scaledHeight) / 2;
-            
-            ctx.drawImage(img, offsetX, offsetY, scaledWidth, scaledHeight);
-            
-            if (element.style.shadow) {
-              ctx.shadowColor = 'rgba(0,0,0,0.5)';
-              ctx.shadowBlur = 20;
-            }
-            
-            ctx.restore();
-            resolve();
-          };
-          img.onerror = () => resolve();
-          img.src = value;
-        });
-        imagePromises.push(promise);
-      }
-
-      if (element.type === 'logo' && typeof value === 'string' && value) {
-        const promise = new Promise<void>((resolve) => {
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.onload = () => {
-            const aspectRatio = img.width / img.height;
-            let drawWidth = element.width;
-            let drawHeight = element.height;
-            
-            if (aspectRatio > element.width / element.height) {
-              drawHeight = drawWidth / aspectRatio;
-            } else {
-              drawWidth = drawHeight * aspectRatio;
-            }
-            
-            ctx.drawImage(
-              img,
-              element.x + (element.width - drawWidth) / 2,
-              element.y + (element.height - drawHeight) / 2,
-              drawWidth,
-              drawHeight
-            );
-            resolve();
-          };
-          img.onerror = () => resolve();
-          img.src = value;
-        });
-        imagePromises.push(promise);
-      }
-    });
-
+    // Wait for images then draw text elements
     Promise.all(imagePromises).then(() => {
+      layout.elements
+        .filter(el => el.type !== 'image' && el.type !== 'logo')
+        .forEach((element) => {
+          const value = element.binding ? data[element.binding] : element.content;
+
+          if (element.type === 'badge') {
+            ctx.fillStyle = element.style.backgroundColor || '#dc2626';
+            roundRect(ctx, element.x, element.y, element.width, element.height, element.style.borderRadius || 4);
+            ctx.fill();
+
+            ctx.fillStyle = element.style.color || '#ffffff';
+            ctx.font = `${element.style.fontWeight || 'bold'} ${element.style.fontSize || 28}px ${element.style.fontFamily || 'Bebas Neue'}`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(
+              element.content || '',
+              element.x + element.width / 2,
+              element.y + element.height / 2
+            );
+          }
+
+          if (element.type === 'text' && typeof value === 'string') {
+            ctx.fillStyle = element.style.color || '#ffffff';
+            const fontSize = element.style.fontSize || 48;
+            ctx.font = `${element.style.fontWeight || 'bold'} ${fontSize}px ${element.style.fontFamily || 'Oswald'}`;
+            ctx.textAlign = (element.style.textAlign as CanvasTextAlign) || 'left';
+            ctx.textBaseline = 'top';
+
+            const text = element.style.textTransform === 'uppercase' ? value.toUpperCase() : value;
+            const lines = wrapText(ctx, text, element.width, element.style.maxLines || 3);
+            
+            lines.forEach((line, i) => {
+              let x = element.x;
+              if (element.style.textAlign === 'center') {
+                x = element.x + element.width / 2;
+              } else if (element.style.textAlign === 'right') {
+                x = element.x + element.width;
+              }
+              ctx.fillText(line, x, element.y + i * (fontSize * 1.2));
+            });
+          }
+
+          if (element.type === 'ticker' && typeof value === 'string') {
+            ctx.fillStyle = element.style.backgroundColor || '#dc2626';
+            ctx.fillRect(element.x, element.y, element.width, element.height);
+
+            ctx.fillStyle = element.style.color || '#ffffff';
+            ctx.font = `${element.style.fontWeight || 'bold'} ${element.style.fontSize || 26}px ${element.style.fontFamily || 'Roboto'}`;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            
+            const padding = element.style.padding || 20;
+            const tickerText = value.length > 150 ? value.substring(0, 147) + '...' : value;
+            ctx.fillText(tickerText, element.x + padding, element.y + element.height / 2);
+          }
+        });
+
       setIsRendered(true);
     });
-  }, [data]);
+  }, [data, variantId]);
 
   const handleDownload = () => {
     if (!canvasRef.current) return;
     
     const link = document.createElement('a');
-    link.download = `news-template-${data?.newsType}-${Date.now()}.png`;
+    link.download = `news-template-${data?.newsType}-${variantId}-${Date.now()}.png`;
     link.href = canvasRef.current.toDataURL('image/png');
     link.click();
     toast.success('Template downloaded successfully!');
@@ -179,7 +211,7 @@ export function TemplatePreview({ data, isGenerating }: TemplatePreviewProps) {
     toast.success('Template launched to social media!', {
       description: 'Your template has been queued for publishing.',
     });
-    console.log('Launching template:', data);
+    console.log('Launching template:', { data, variantId });
   };
 
   return (
@@ -235,7 +267,6 @@ export function TemplatePreview({ data, isGenerating }: TemplatePreviewProps) {
   );
 }
 
-// Utility functions
 function roundRect(
   ctx: CanvasRenderingContext2D,
   x: number,

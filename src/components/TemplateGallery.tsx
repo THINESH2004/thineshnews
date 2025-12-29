@@ -1,3 +1,4 @@
+import { templateVariants } from '@/data/templateLayouts';
 import { NEWS_TYPE_CONFIG, NewsType } from '@/types/template';
 import { cn } from '@/lib/utils';
 import { 
@@ -30,6 +31,11 @@ interface TemplateGalleryProps {
 }
 
 export function TemplateGallery({ onSelect }: TemplateGalleryProps) {
+  const totalTemplates = Object.values(templateVariants).reduce(
+    (acc, variants) => acc + variants.length, 
+    0
+  );
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -37,7 +43,7 @@ export function TemplateGallery({ onSelect }: TemplateGalleryProps) {
           Template Library
         </h3>
         <span className="text-sm text-muted-foreground">
-          {Object.keys(NEWS_TYPE_CONFIG).length} templates available
+          {totalTemplates} templates across {Object.keys(NEWS_TYPE_CONFIG).length} categories
         </span>
       </div>
 
@@ -46,6 +52,7 @@ export function TemplateGallery({ onSelect }: TemplateGalleryProps) {
           ([type, config]) => {
             const Icon = iconMap[config.icon as keyof typeof iconMap];
             const gradientClass = colorMap[config.color] || 'from-red-600 to-red-800';
+            const variantCount = templateVariants[type]?.length || 0;
 
             return (
               <button
@@ -62,6 +69,9 @@ export function TemplateGallery({ onSelect }: TemplateGalleryProps) {
                   <Icon className="w-8 h-8 text-white drop-shadow-lg" />
                   <span className="text-sm font-headline text-white text-center uppercase tracking-wider drop-shadow-lg">
                     {config.label}
+                  </span>
+                  <span className="text-xs text-white/70 font-body">
+                    {variantCount} style{variantCount !== 1 ? 's' : ''}
                   </span>
                 </div>
 

@@ -10,15 +10,16 @@ import { Sparkles, Tv2 } from 'lucide-react';
 
 export default function Index() {
   const [generatedData, setGeneratedData] = useState<NewsFormData | null>(null);
+  const [currentVariantId, setCurrentVariantId] = useState<string>('breaking-classic');
   const [isGenerating, setIsGenerating] = useState(false);
   const [templatesGenerated, setTemplatesGenerated] = useState(0);
-  const [selectedType, setSelectedType] = useState<NewsType>('breaking');
 
-  const handleGenerate = useCallback(async (data: NewsFormData) => {
+  const handleGenerate = useCallback(async (data: NewsFormData, variantId: string) => {
     setIsGenerating(true);
+    setCurrentVariantId(variantId);
     
     // Simulate AI processing
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 1500));
     
     // AI enhancements would happen here
     const enhancedData = {
@@ -38,7 +39,6 @@ export default function Index() {
   }, []);
 
   const handleTemplateSelect = (type: NewsType) => {
-    setSelectedType(type);
     toast.info(`Selected ${type} template`, {
       description: 'Customize and generate your template.',
     });
@@ -97,7 +97,11 @@ export default function Index() {
 
           {/* Preview Panel */}
           <div className="glass-panel rounded-2xl p-6 border border-border/30 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-            <TemplatePreview data={generatedData} isGenerating={isGenerating} />
+            <TemplatePreview 
+              data={generatedData} 
+              variantId={currentVariantId}
+              isGenerating={isGenerating} 
+            />
           </div>
         </div>
 
