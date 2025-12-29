@@ -4,6 +4,7 @@ import { templateVariants } from '@/data/templateLayouts';
 import { Button } from './ui/button';
 import { Download, Send, Maximize2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
+import { safeFilename, sanitizeText, isValidImageSrc } from '@/lib/utils';
 
 interface TemplatePreviewProps {
   data: NewsFormData | null;
@@ -76,48 +77,43 @@ export function TemplatePreview({ data, variantId, isGenerating }: TemplatePrevi
     layout.elements
       .filter(el => el.type === 'image' || el.type === 'logo')
       .forEach((element) => {
-        const value = element.binding ? data[element.binding] : null;
+        const rawValue = element.binding ? (data as any)[element.binding] : null;
+        const value = typeof rawValue === 'string' ? rawValue.trim() : null;
 
-        if (element.type === 'image' && typeof value === 'string' && value) {
+        // Validate image source before loading to prevent javascript: and other unsafe schemes
+        if ((element.type === 'image' || element.type === 'logo') && typeof value === 'string' && value && isValidImageSrc(value)) {
           const promise = new Promise<void>((resolve) => {
             const img = new Image();
             img.crossOrigin = 'anonymous';
             img.onload = () => {
-              ctx.save();
-              roundRect(ctx, element.x, element.y, element.width, element.height, element.style.borderRadius || 0);
-              ctx.clip();
-              
-              const scale = Math.max(element.width / img.width, element.height / img.height);
-              const scaledWidth = img.width * scale;
-              const scaledHeight = img.height * scale;
-              const offsetX = element.x + (element.width - scaledWidth) / 2;
-              const offsetY = element.y + (element.height - scaledHeight) / 2;
-              
-              ctx.drawImage(img, offsetX, offsetY, scaledWidth, scaledHeight);
-              ctx.restore();
-              resolve();
-            };
-            img.onerror = () => resolve();
-            img.src = value;
-          });
-          imagePromises.push(promise);
-        }
+              if (element.type === 'image') {
+                ctx.save();
+                roundRect(ctx, element.x, element.y, element.width, element.height, element.style.borderRadius || 0);
+                ctx.clip();
 
-        if (element.type === 'logo' && typeof value === 'string' && value) {
-          const promise = new Promise<void>((resolve) => {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.onload = () => {
+                const scale = Math.max(element.width / img.width, element.height / img.height);
+                const scaledWidth = img.width * scale;
+                const scaledHeight = img.height * scale;
+                const offsetX = element.x + (element.width - scaledWidth) / 2;
+                const offsetY = element.y + (element.height - scaledHeight) / 2;
+
+                ctx.drawImage(img, offsetX, offsetY, scaledWidth, scaledHeight);
+                ctx.restore();
+                resolve();
+                return;
+              }
+
+              // logo
               const aspectRatio = img.width / img.height;
               let drawWidth = element.width;
               let drawHeight = element.height;
-              
+
               if (aspectRatio > element.width / element.height) {
                 drawHeight = drawWidth / aspectRatio;
               } else {
                 drawWidth = drawHeight * aspectRatio;
               }
-              
+
               ctx.drawImage(
                 img,
                 element.x + (element.width - drawWidth) / 2,
@@ -128,7 +124,7 @@ export function TemplatePreview({ data, variantId, isGenerating }: TemplatePrevi
               resolve();
             };
             img.onerror = () => resolve();
-            img.src = value;
+            img.src = value as string;
           });
           imagePromises.push(promise);
         }
@@ -139,7 +135,8 @@ export function TemplatePreview({ data, variantId, isGenerating }: TemplatePrevi
       layout.elements
         .filter(el => el.type !== 'image' && el.type !== 'logo')
         .forEach((element) => {
-          const value = element.binding ? data[element.binding] : element.content;
+          const rawValue = element.binding ? (data as any)[element.binding] : element.content;
+          const value = typeof rawValue === 'string' ? sanitizeText(rawValue, 2000) : (rawValue as any);
 
           if (element.type === 'badge') {
             ctx.fillStyle = element.style.backgroundColor || '#dc2626';
@@ -147,7 +144,8 @@ export function TemplatePreview({ data, variantId, isGenerating }: TemplatePrevi
             ctx.fill();
 
             ctx.fillStyle = element.style.color || '#ffffff';
-            ctx.font = `${element.style.fontWeight || 'bold'} ${element.style.fontSize || 28}px ${element.style.fontFamily || 'Bebas Neue'}`;
+            const badgeFontSize = element.style.fontSize || 28;
+            ctx.font = `${element.style.fontWeight || 'bold'} ${badgeFontSize}px ${element.style.fontFamily || 'Bebas Neue'}`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(
@@ -159,8 +157,21 @@ export function TemplatePreview({ data, variantId, isGenerating }: TemplatePrevi
 
           if (element.type === 'text' && typeof value === 'string') {
             ctx.fillStyle = element.style.color || '#ffffff';
-            const fontSize = element.style.fontSize || 48;
-            ctx.font = `${element.style.fontWeight || 'bold'} ${fontSize}px ${element.style.fontFamily || 'Oswald'}`;
+
+            // Determine font family and size with user overrides
+            let fontFamily = element.style.fontFamily || 'Oswald';
+            let fontSize = element.style.fontSize || 48;
+
+            if (element.binding === 'headline' && data.headlineFontFamily) fontFamily = data.headlineFontFamily;
+            if (element.binding === 'headline' && data.headlineFontSize) fontSize = Number(data.headlineFontSize);
+            if (element.binding === 'subHeadline' && data.subHeadlineFontFamily) fontFamily = data.subHeadlineFontFamily;
+            if (element.binding === 'subHeadline' && data.subHeadlineFontSize) fontSize = Number(data.subHeadlineFontSize);
+            if (element.binding === 'description' && data.descriptionFontSize) fontSize = Number(data.descriptionFontSize);
+
+            // Clamp font sizes
+            fontSize = Math.max(8, Math.min(200, fontSize));
+
+            ctx.font = `${element.style.fontWeight || 'bold'} ${fontSize}px ${fontFamily}`;
             ctx.textAlign = (element.style.textAlign as CanvasTextAlign) || 'left';
             ctx.textBaseline = 'top';
 
@@ -183,7 +194,10 @@ export function TemplatePreview({ data, variantId, isGenerating }: TemplatePrevi
             ctx.fillRect(element.x, element.y, element.width, element.height);
 
             ctx.fillStyle = element.style.color || '#ffffff';
-            ctx.font = `${element.style.fontWeight || 'bold'} ${element.style.fontSize || 26}px ${element.style.fontFamily || 'Roboto'}`;
+            const tickerSize = element.style.fontSize || 26;
+            const descSize = data.descriptionFontSize ? Number(data.descriptionFontSize) : tickerSize;
+            const finalSize = Math.max(10, Math.min(80, descSize));
+            ctx.font = `${element.style.fontWeight || 'bold'} ${finalSize}px ${element.style.fontFamily || 'Roboto'}`;
             ctx.textAlign = 'left';
             ctx.textBaseline = 'middle';
             
@@ -201,7 +215,9 @@ export function TemplatePreview({ data, variantId, isGenerating }: TemplatePrevi
     if (!canvasRef.current) return;
     
     const link = document.createElement('a');
-    link.download = `news-template-${data?.newsType}-${variantId}-${Date.now()}.png`;
+    const safeType = safeFilename(data?.newsType ?? 'template');
+    const safeVariant = safeFilename(variantId);
+    link.download = `news-template-${safeType}-${safeVariant}-${Date.now()}.png`;
     link.href = canvasRef.current.toDataURL('image/png');
     link.click();
     toast.success('Template downloaded successfully!');
@@ -211,7 +227,6 @@ export function TemplatePreview({ data, variantId, isGenerating }: TemplatePrevi
     toast.success('Template launched to social media!', {
       description: 'Your template has been queued for publishing.',
     });
-    console.log('Launching template:', { data, variantId });
   };
 
   return (
@@ -229,6 +244,49 @@ export function TemplatePreview({ data, variantId, isGenerating }: TemplatePrevi
             <Button variant="success" size="sm" onClick={handleLaunch}>
               <Send className="w-4 h-4" />
               Launch
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                // Publish to Telegram via configured webhook
+                const endpoint = import.meta.env.VITE_TELEGRAM_API;
+                if (!endpoint) {
+                  toast.error('Telegram publish not configured (VITE_TELEGRAM_API).');
+                  return;
+                }
+
+                if (!canvasRef.current) return;
+                const payload = {
+                  image: canvasRef.current.toDataURL('image/png'),
+                  caption: sanitizeText(data.headline, 200),
+                  channelTemplate: data.channelTemplate || null,
+                };
+
+                try {
+                  const headers: Record<string,string> = { 'Content-Type': 'application/json' };
+                const secret = import.meta.env.VITE_TELEGRAM_SECRET;
+                if (secret) headers['x-webhook-secret'] = secret;
+
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(payload),
+                  });
+
+                  if (res.ok) {
+                    toast.success('Published to Telegram!');
+                  } else {
+                    const text = await res.text();
+                    toast.error('Publish failed: ' + text);
+                  }
+                } catch (e) {
+                  toast.error('Publish request failed.');
+                }
+              }}
+            >
+              <Send className="w-4 h-4" />
+              Publish → Telegram
             </Button>
           </div>
         )}

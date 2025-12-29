@@ -2049,6 +2049,28 @@ export const templateVariants: Record<NewsType, TemplateVariant[]> = {
     { id: 'breaking-modern', name: 'Modern', style: 'modern', layout: breakingModern },
     { id: 'breaking-bold', name: 'Bold Split', style: 'bold', layout: breakingBold },
     { id: 'breaking-minimal', name: 'Minimal Light', style: 'minimal', layout: breakingMinimal },
+    // Channel-inspired templates (generic/inspired, not reproductions of trademarks)
+    { id: 'channel-polimer', name: 'Polimer - Inspired', style: 'modern', layout: {
+      id: 'channel-polimer', name: 'Polimer - Inspired', type: 'breaking', width: 1920, height: 1080, backgroundColor: '#0b0b0f', gradientOverlay: 'linear-gradient(135deg, rgba(220,38,38,0.2) 0%, rgba(0,0,0,0.9) 100%)', elements: [
+        { id: 'badge', type: 'badge', x: 50, y: 50, width: 260, height: 60, style: { backgroundColor: '#e11d48', color: '#fff', fontSize: 28, fontFamily: 'Bebas Neue', fontWeight: 'bold', textAlign: 'center', borderRadius: 4, textTransform: 'uppercase' }, content: 'POLIMER NEWS' },
+        { id: 'headline', type: 'text', x: 50, y: 600, width: 1250, height: 240, style: { fontSize: 76, fontFamily: 'Oswald', fontWeight: 'bold', color: '#fff', textAlign: 'left', textTransform: 'uppercase', maxLines: 3 }, binding: 'headline' },
+        { id: 'subheadline', type: 'text', x: 50, y: 860, width: 1250, height: 80, style: { fontSize: 36, fontFamily: 'Roboto', color: '#ddd', textAlign: 'left', maxLines: 2 }, binding: 'subHeadline' },
+        { id: 'ticker', type: 'ticker', x: 0, y: 1000, width: 1920, height: 80, style: { backgroundColor: '#e11d48', color: '#fff', fontSize: 28, fontFamily: 'Roboto', fontWeight: 'bold', padding: 20 }, binding: 'description' },
+      ] } },
+    { id: 'channel-sun', name: 'Sun - Inspired', style: 'modern', layout: {
+      id: 'channel-sun', name: 'Sun - Inspired', type: 'breaking', width: 1920, height: 1080, backgroundColor: '#081018', gradientOverlay: 'linear-gradient(135deg, rgba(245,158,11,0.2) 0%, rgba(0,0,0,0.9) 100%)', elements: [
+        { id: 'badge', type: 'badge', x: 50, y: 50, width: 260, height: 60, style: { backgroundColor: '#f59e0b', color: '#000', fontSize: 26, fontFamily: 'Bebas Neue', fontWeight: 'bold', textAlign: 'center', borderRadius: 4, textTransform: 'uppercase' }, content: 'SUN NEWS' },
+        { id: 'headline', type: 'text', x: 50, y: 600, width: 1250, height: 240, style: { fontSize: 72, fontFamily: 'Oswald', fontWeight: 'bold', color: '#fff', textAlign: 'left', textTransform: 'uppercase', maxLines: 3 }, binding: 'headline' },
+        { id: 'subheadline', type: 'text', x: 50, y: 860, width: 1250, height: 80, style: { fontSize: 34, fontFamily: 'Roboto', color: '#eee', textAlign: 'left', maxLines: 2 }, binding: 'subHeadline' },
+        { id: 'ticker', type: 'ticker', x: 0, y: 1000, width: 1920, height: 80, style: { backgroundColor: '#111827', color: '#fff', fontSize: 28, fontFamily: 'Roboto', fontWeight: 'bold', padding: 20 }, binding: 'description' },
+      ] } },
+    { id: 'channel-jaya', name: 'Jaya - Inspired', style: 'modern', layout: {
+      id: 'channel-jaya', name: 'Jaya - Inspired', type: 'breaking', width: 1920, height: 1080, backgroundColor: '#071019', gradientOverlay: 'linear-gradient(135deg, rgba(6,182,212,0.15) 0%, rgba(0,0,0,0.95) 100%)', elements: [
+        { id: 'badge', type: 'badge', x: 50, y: 50, width: 260, height: 60, style: { backgroundColor: '#06b6d4', color: '#000', fontSize: 26, fontFamily: 'Bebas Neue', fontWeight: 'bold', textAlign: 'center', borderRadius: 4, textTransform: 'uppercase' }, content: 'JAYA NEWS' },
+        { id: 'headline', type: 'text', x: 50, y: 600, width: 1250, height: 240, style: { fontSize: 72, fontFamily: 'Oswald', fontWeight: 'bold', color: '#fff', textAlign: 'left', textTransform: 'uppercase', maxLines: 3 }, binding: 'headline' },
+        { id: 'subheadline', type: 'text', x: 50, y: 860, width: 1250, height: 80, style: { fontSize: 34, fontFamily: 'Roboto', color: '#eee', textAlign: 'left', maxLines: 2 }, binding: 'subHeadline' },
+        { id: 'ticker', type: 'ticker', x: 0, y: 1000, width: 1920, height: 80, style: { backgroundColor: '#06b6d4', color: '#000', fontSize: 28, fontFamily: 'Roboto', fontWeight: 'bold', padding: 20 }, binding: 'description' },
+      ] } },
   ],
   sports: [
     { id: 'sports-classic', name: 'Classic', style: 'classic', layout: sportsClassic },

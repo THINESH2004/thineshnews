@@ -21,7 +21,20 @@ export interface NewsFormData {
   newsImage: string | null;
   logoImage: string | null;
   language: Language;
-}
+
+  // Optional overrides for fonts and sizes per element (user-controlled)
+  headlineFontFamily?: string;
+  headlineFontSize?: number;
+  subHeadlineFontFamily?: string;
+  subHeadlineFontSize?: number;
+  descriptionFontSize?: number;
+
+  // Channel template selection (e.g., inspired designs)
+  channelTemplate?: string;
+
+  // Publishing target (only 'telegram' supported client-side for now)
+  publishChannel?: 'telegram' | null;
+} 
 
 export interface TemplateLayout {
   id: string;

@@ -7,6 +7,7 @@ import { TemplateGallery } from '@/components/TemplateGallery';
 import { NewsFormData, NewsType } from '@/types/template';
 import { toast } from 'sonner';
 import { Sparkles, Tv2 } from 'lucide-react';
+import { sanitizeText, validateNewsFormData } from '@/lib/utils';
 
 export default function Index() {
   const [generatedData, setGeneratedData] = useState<NewsFormData | null>(null);
@@ -17,16 +18,30 @@ export default function Index() {
   const handleGenerate = useCallback(async (data: NewsFormData, variantId: string) => {
     setIsGenerating(true);
     setCurrentVariantId(variantId);
-    
+
+    // Validate/sanitize (defense-in-depth)
+    const sanitized = {
+      ...data,
+      headline: sanitizeText(data.headline, 200),
+      subHeadline: sanitizeText(data.subHeadline, 200),
+      description: sanitizeText(data.description, 2000),
+      reporterName: sanitizeText(data.reporterName, 100),
+      location: sanitizeText(data.location, 100),
+    };
+
+    const errors = validateNewsFormData(sanitized);
+    if (errors.length > 0) {
+      setIsGenerating(false);
+      toast.error(errors.join(' '));
+      return;
+    }
+
     // Simulate AI processing
     await new Promise((resolve) => setTimeout(resolve, 1500));
     
     // AI enhancements would happen here
     const enhancedData = {
-      ...data,
-      headline: data.headline.trim(),
-      subHeadline: data.subHeadline.trim(),
-      description: data.description.trim(),
+      ...sanitized,
     };
     
     setGeneratedData(enhancedData);
