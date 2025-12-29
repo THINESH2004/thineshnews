@@ -2,95 +2,97 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&family=Bebas+Neue&display=swap');
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
+    /* Core palette - Dark newsroom theme */
+    --background: 220 20% 8%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    --card: 220 18% 12%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 220 18% 10%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* News Red - Breaking news accent */
+    --primary: 350 89% 50%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 350 89% 60%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    /* Broadcast Blue - Secondary accent */
+    --secondary: 210 100% 50%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 220 15% 18%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 45 100% 55%;
+    --accent-foreground: 220 20% 8%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --border: 220 15% 20%;
+    --input: 220 15% 15%;
+    --ring: 350 89% 50%;
+
+    --radius: 0.75rem;
+
+    /* Custom tokens */
+    --news-red: 350 89% 50%;
+    --news-red-glow: 350 89% 60%;
+    --broadcast-blue: 210 100% 50%;
+    --broadcast-blue-glow: 210 100% 60%;
+    --live-green: 142 76% 45%;
+    --breaking-yellow: 45 100% 55%;
+    --sports-orange: 25 95% 55%;
+    --weather-cyan: 185 95% 45%;
+    --politics-purple: 270 70% 55%;
+
+    /* Gradients */
+    --gradient-news: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(350 89% 35%) 100%);
+    --gradient-broadcast: linear-gradient(135deg, hsl(var(--secondary)) 0%, hsl(210 100% 35%) 100%);
+    --gradient-dark: linear-gradient(180deg, hsl(220 20% 10%) 0%, hsl(220 20% 6%) 100%);
+    --gradient-glass: linear-gradient(135deg, hsla(220, 20%, 15%, 0.8) 0%, hsla(220, 20%, 10%, 0.6) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
+
+    /* Shadows */
+    --shadow-glow-red: 0 0 40px hsla(350, 89%, 50%, 0.4);
+    --shadow-glow-blue: 0 0 40px hsla(210, 100%, 50%, 0.4);
+    --shadow-card: 0 10px 40px -10px hsla(0, 0%, 0%, 0.5);
+    --shadow-elevated: 0 25px 50px -12px hsla(0, 0%, 0%, 0.6);
+
+    /* Sidebar */
+    --sidebar-background: 220 18% 10%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 350 89% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 220 15% 15%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 220 15% 18%;
+    --sidebar-ring: 350 89% 50%;
+  }
+
+  .light {
+    --background: 0 0% 98%;
+    --foreground: 220 20% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 10%;
+    --primary: 350 89% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 100% 50%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 220 15% 92%;
+    --muted-foreground: 220 15% 40%;
+    --accent: 45 100% 55%;
+    --accent-foreground: 220 20% 10%;
+    --border: 220 15% 85%;
+    --input: 220 15% 90%;
+    --ring: 350 89% 50%;
   }
 }
 
@@ -100,6 +102,92 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Roboto', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply backdrop-blur-xl border border-border/50;
+    background: var(--gradient-glass);
+  }
+
+  .news-headline {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.05em;
+  }
+
+  .glow-red {
+    box-shadow: var(--shadow-glow-red);
+  }
+
+  .glow-blue {
+    box-shadow: var(--shadow-glow-blue);
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-hero);
+  }
+
+  .breaking-badge {
+    @apply animate-pulse;
+    background: var(--gradient-news);
+  }
+
+  .live-indicator {
+    @apply relative;
+  }
+
+  .live-indicator::before {
+    content: '';
+    @apply absolute -left-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full;
+    background: hsl(var(--live-green));
+    animation: live-pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes live-pulse {
+    0%, 100% { opacity: 1; transform: translateY(-50%) scale(1); }
+    50% { opacity: 0.5; transform: translateY(-50%) scale(1.2); }
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.6s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.4s ease-out forwards;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scale-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .text-balance {
+    text-wrap: balance;
   }
 }
