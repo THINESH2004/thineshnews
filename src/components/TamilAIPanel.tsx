@@ -13,7 +13,7 @@ interface TamilAIPanelProps {
   onSelectHeadline?: (headline: string) => void;
 }
 
-type TranslationMode = 'translate' | 'headlines' | 'template' | 'telegram' | 'full';
+type TranslationMode = 'translate' | 'headlines' | 'template' | 'telegram' | 'full' | 'bullets' | 'numbered';
 
 export function TamilAIPanel({ englishText = '', onSelectHeadline }: TamilAIPanelProps) {
   const [inputText, setInputText] = useState(englishText);
@@ -89,15 +89,19 @@ export function TamilAIPanel({ englishText = '', onSelectHeadline }: TamilAIPane
         />
 
         <Tabs defaultValue="full" className="w-full">
-          <TabsList className="grid grid-cols-5 h-auto">
+          <TabsList className="grid grid-cols-4 h-auto mb-1">
             <TabsTrigger value="full" className="text-xs py-1.5">Full</TabsTrigger>
             <TabsTrigger value="translate" className="text-xs py-1.5">Translate</TabsTrigger>
             <TabsTrigger value="headlines" className="text-xs py-1.5">Headlines</TabsTrigger>
             <TabsTrigger value="template" className="text-xs py-1.5">Template</TabsTrigger>
+          </TabsList>
+          <TabsList className="grid grid-cols-3 h-auto">
             <TabsTrigger value="telegram" className="text-xs py-1.5">Telegram</TabsTrigger>
+            <TabsTrigger value="bullets" className="text-xs py-1.5">Bullets</TabsTrigger>
+            <TabsTrigger value="numbered" className="text-xs py-1.5">Numbered</TabsTrigger>
           </TabsList>
 
-          {(['full', 'translate', 'headlines', 'template', 'telegram'] as TranslationMode[]).map((mode) => (
+          {(['full', 'translate', 'headlines', 'template', 'telegram', 'bullets', 'numbered'] as TranslationMode[]).map((mode) => (
             <TabsContent key={mode} value={mode} className="mt-3">
               <Button
                 onClick={() => handleTranslate(mode)}
