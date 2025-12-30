@@ -3,6 +3,7 @@ import { NewsFormData, NewsType, Language } from '@/types/template';
 import { NewsTypeSelector } from './NewsTypeSelector';
 import { TemplateStyleSelector } from './TemplateStyleSelector';
 import { ImageUploader } from './ImageUploader';
+import { TamilAIPanel } from './TamilAIPanel';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
@@ -134,6 +135,14 @@ export function NewsForm({ onGenerate, isGenerating }: NewsFormProps) {
         </div>
       </div>
 
+      {/* Tamil AI Assistant Panel */}
+      {formData.language === 'ta' && (
+        <TamilAIPanel
+          englishText={formData.headline}
+          onSelectHeadline={(headline) => handleChange('headline', headline)}
+        />
+      )}
+
       {/* Main Content Fields */}
       <div className="space-y-4">
         <div>
@@ -143,7 +152,7 @@ export function NewsForm({ onGenerate, isGenerating }: NewsFormProps) {
           <Input
             value={formData.headline}
             onChange={(e) => handleChange('headline', e.target.value)}
-            placeholder="Enter your news headline..."
+            placeholder={formData.language === 'ta' ? "தலைப்பு உள்ளிடவும்..." : "Enter your news headline..."}
             className="h-12 text-lg font-headline"
             required
           />
@@ -156,7 +165,7 @@ export function NewsForm({ onGenerate, isGenerating }: NewsFormProps) {
           <Input
             value={formData.subHeadline}
             onChange={(e) => handleChange('subHeadline', e.target.value)}
-            placeholder="Additional context or subtitle..."
+            placeholder={formData.language === 'ta' ? "துணை தலைப்பு..." : "Additional context or subtitle..."}
           />
         </div>
 
@@ -167,7 +176,7 @@ export function NewsForm({ onGenerate, isGenerating }: NewsFormProps) {
           <Textarea
             value={formData.description}
             onChange={(e) => handleChange('description', e.target.value)}
-            placeholder="Detailed description for ticker bar..."
+            placeholder={formData.language === 'ta' ? "விரிவான விளக்கம்..." : "Detailed description for ticker bar..."}
             rows={3}
             required
           />

@@ -1,0 +1,4 @@
+project_id = "yuqthsrsrazfngoqnrgf"
+
+[functions.tamil-translate]
+verify_jwt = false
