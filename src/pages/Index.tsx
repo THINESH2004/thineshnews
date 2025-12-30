@@ -4,16 +4,19 @@ import { NewsForm } from '@/components/NewsForm';
 import { TemplatePreview } from '@/components/TemplatePreview';
 import { StatsPanel } from '@/components/StatsPanel';
 import { TemplateGallery } from '@/components/TemplateGallery';
+import { TelegramSettings } from '@/components/TelegramSettings';
 import { NewsFormData, NewsType } from '@/types/template';
 import { toast } from 'sonner';
-import { Sparkles, Tv2 } from 'lucide-react';
+import { Sparkles, Tv2, Settings } from 'lucide-react';
 import { sanitizeText, validateNewsFormData } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 export default function Index() {
   const [generatedData, setGeneratedData] = useState<NewsFormData | null>(null);
   const [currentVariantId, setCurrentVariantId] = useState<string>('breaking-classic');
   const [isGenerating, setIsGenerating] = useState(false);
   const [templatesGenerated, setTemplatesGenerated] = useState(0);
+  const [showTelegramSettings, setShowTelegramSettings] = useState(false);
 
   const handleGenerate = useCallback(async (data: NewsFormData, variantId: string) => {
     setIsGenerating(true);
@@ -80,6 +83,15 @@ export default function Index() {
               Replace manual Photoshop work with AI-driven template generation. 
               Create professional broadcast-quality graphics in seconds.
             </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowTelegramSettings(!showTelegramSettings)}
+              className="mt-4"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Telegram Settings
+            </Button>
           </div>
         </div>
       </section>
@@ -88,6 +100,13 @@ export default function Index() {
       <section className="container mx-auto px-6 -mt-6 relative z-10">
         <StatsPanel templatesGenerated={templatesGenerated} />
       </section>
+
+      {/* Telegram Settings Panel */}
+      {showTelegramSettings && (
+        <section className="container mx-auto px-6 mt-6">
+          <TelegramSettings onClose={() => setShowTelegramSettings(false)} />
+        </section>
+      )}
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-12">
