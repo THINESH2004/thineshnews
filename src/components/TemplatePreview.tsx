@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { NewsFormData } from '@/types/template';
-import { templateVariants } from '@/data/templateLayouts';
+import { getTemplateVariants } from '@/data/templateLayouts';
 import { Button } from './ui/button';
 import { Download, Send, Maximize2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
@@ -24,7 +24,7 @@ export function TemplatePreview({ data, variantId, isGenerating }: TemplatePrevi
     if (!ctx) return;
 
     // Find the layout from variants
-    const variants = templateVariants[data.newsType];
+    const variants = getTemplateVariants()[data.newsType];
     const variant = variants?.find(v => v.id === variantId) || variants?.[0];
     if (!variant) return;
 
@@ -301,6 +301,51 @@ export function TemplatePreview({ data, variantId, isGenerating }: TemplatePrevi
               <Send className="w-4 h-4" />
               Launch
             </Button>
+
+            {/* Publish as "News" (sends image + caption 'News') */}
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={async () => {
+                const endpoint = import.meta.env.VITE_TELEGRAM_API;
+                if (!endpoint) {
+                  toast.error('Telegram publish not configured (VITE_TELEGRAM_API).');
+                  return;
+                }
+
+                if (!canvasRef.current) return;
+                const payload = {
+                  image: canvasRef.current.toDataURL('image/png'),
+                  caption: 'News',
+                  channelTemplate: data.channelTemplate || null,
+                };
+
+                try {
+                  const headers: Record<string,string> = { 'Content-Type': 'application/json' };
+                  const secret = import.meta.env.VITE_TELEGRAM_SECRET;
+                  if (secret) headers['x-webhook-secret'] = secret;
+
+                  const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(payload),
+                  });
+
+                  if (res.ok) {
+                    toast.success('Published to Telegram as "News"!');
+                  } else {
+                    const text = await res.text();
+                    toast.error('Publish failed: ' + text);
+                  }
+                } catch (e) {
+                  toast.error('Publish request failed.');
+                }
+              }}
+            >
+              <Send className="w-4 h-4" />
+              Publish as "News"
+            </Button>
+
             <Button
               variant="outline"
               size="sm"

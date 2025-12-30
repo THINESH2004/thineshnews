@@ -9,10 +9,10 @@ describe('POST /publish', () => {
     app = createApp();
   });
 
-  test('rejects missing image', async () => {
+  test('rejects missing publish content', async () => {
     const res = await request(app).post('/publish').send({ caption: 'hello' });
     expect(res.status).toBe(400);
-    expect(res.body.error).toMatch(/Missing image/);
+    expect(res.body.error).toMatch(/Missing publish content/);
   });
 
   test('rejects invalid image format', async () => {
@@ -29,6 +29,26 @@ describe('POST /publish', () => {
     // ensure job was enqueued (BullMQ exposes job retrieval)
     const job = await app._publishQueue.getJob(res.body.jobId);
     expect(job).not.toBeNull();
+  });
+
+  test('queues text-only publish', async () => {
+    const res = await request(app).post('/publish').send({ text: '1,2,3,4,5' });
+    expect(res.status).toBe(200);
+    expect(res.body.queued).toBe(true);
+
+    const job = await app._publishQueue.getJob(res.body.jobId);
+    expect(job).not.toBeNull();
+    expect(job.data.text).toBe('1,2,3,4,5');
+  });
+
+  test('allows chatId override per request', async () => {
+    const res = await request(app).post('/publish').send({ text: 'hello', chatId: '@newaithinesh' });
+    expect(res.status).toBe(200);
+    expect(res.body.queued).toBe(true);
+
+    const job = await app._publishQueue.getJob(res.body.jobId);
+    expect(job).not.toBeNull();
+    expect(job.data.chatId).toBe('@newaithinesh');
   });
 
   test('requires auth when secret env set', async () => {

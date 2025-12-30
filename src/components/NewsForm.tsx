@@ -6,7 +6,7 @@ import { ImageUploader } from './ImageUploader';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
-import { templateVariants } from '@/data/templateLayouts';
+import { getTemplateVariants } from '@/data/templateLayouts';
 import { 
   Sparkles, MapPin, User, Calendar, Languages,
   Wand2, RefreshCw
@@ -48,7 +48,7 @@ export function NewsForm({ onGenerate, isGenerating }: NewsFormProps) {
 
   // Update variant when news type changes
   useEffect(() => {
-    const variants = templateVariants[formData.newsType];
+    const variants = getTemplateVariants()[formData.newsType];
     if (variants && variants.length > 0) {
       setSelectedVariant(variants[0].id);
     }

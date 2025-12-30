@@ -1,4 +1,4 @@
-import { templateVariants } from '@/data/templateLayouts';
+import { getTemplateVariants } from '@/data/templateLayouts';
 import { NEWS_TYPE_CONFIG, NewsType } from '@/types/template';
 import { cn } from '@/lib/utils';
 import { 
@@ -31,8 +31,9 @@ interface TemplateGalleryProps {
 }
 
 export function TemplateGallery({ onSelect }: TemplateGalleryProps) {
-  const totalTemplates = Object.values(templateVariants).reduce(
-    (acc, variants) => acc + variants.length, 
+  const variantsMap = getTemplateVariants();
+  const totalTemplates = Object.values(variantsMap).reduce(
+    (acc, variants) => acc + variants.length,
     0
   );
 
@@ -52,7 +53,7 @@ export function TemplateGallery({ onSelect }: TemplateGalleryProps) {
           ([type, config]) => {
             const Icon = iconMap[config.icon as keyof typeof iconMap];
             const gradientClass = colorMap[config.color] || 'from-red-600 to-red-800';
-            const variantCount = templateVariants[type]?.length || 0;
+            const variantCount = variantsMap[type]?.length || 0;
 
             return (
               <button

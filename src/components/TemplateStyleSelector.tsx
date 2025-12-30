@@ -1,4 +1,4 @@
-import { templateVariants, TemplateVariant, TemplateStyle } from '@/data/templateLayouts';
+import { getTemplateVariants, TemplateVariant, TemplateStyle } from '@/data/templateLayouts';
 import { NewsType, NEWS_TYPE_CONFIG } from '@/types/template';
 import { cn } from '@/lib/utils';
 import { Check, Layers } from 'lucide-react';
@@ -17,7 +17,7 @@ const styleColors: Record<TemplateStyle, { bg: string; border: string; text: str
 };
 
 export function TemplateStyleSelector({ newsType, selectedVariant, onChange }: TemplateStyleSelectorProps) {
-  const variants = templateVariants[newsType];
+  const variants = getTemplateVariants()[newsType];
   const config = NEWS_TYPE_CONFIG[newsType];
 
   if (!variants || variants.length <= 1) return null;
