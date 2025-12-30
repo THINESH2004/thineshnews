@@ -39,6 +39,7 @@ const initialData: NewsFormData = {
   descriptionFontSize: 28,
   channelTemplate: '',
   publishChannel: null,
+  autoPublish: false,
 };
 
 export function NewsForm({ onGenerate, isGenerating }: NewsFormProps) {
@@ -76,7 +77,7 @@ export function NewsForm({ onGenerate, isGenerating }: NewsFormProps) {
       subHeadlineFontSize: Math.max(10, Math.min(120, Number(formData.subHeadlineFontSize) || 36)),
       descriptionFontSize: Math.max(10, Math.min(80, Number(formData.descriptionFontSize) || 28)),
       channelTemplate: sanitizeText(formData.channelTemplate || '', 64),
-      publishChannel: formData.publishChannel === 'telegram' ? 'telegram' : null,
+      publishChannel: formData.publishChannel === 'telegram' ? ('telegram' as const) : null,
     };
 
     const errors = validateNewsFormData(sanitized);
@@ -313,18 +314,31 @@ export function NewsForm({ onGenerate, isGenerating }: NewsFormProps) {
             </select>
           </div>
 
-          <div className="flex items-center gap-2">
-            <input
-              id="publish-telegram"
-              type="checkbox"
-              checked={formData.publishChannel === 'telegram'}
-              onChange={(e) => handleChange('publishChannel', e.target.checked ? 'telegram' : null)}
-              className="w-4 h-4"
-            />
-            <label htmlFor="publish-telegram" className="text-sm text-foreground">Queue for Telegram publish</label>
-          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <input
+                id="publish-telegram"
+                type="checkbox"
+                checked={formData.publishChannel === 'telegram'}
+                onChange={(e) => handleChange('publishChannel', e.target.checked ? 'telegram' : null)}
+                className="w-4 h-4"
+              />
+              <label htmlFor="publish-telegram" className="text-sm text-foreground">Queue for Telegram publish</label>
+            </div>
 
-          <p className="text-xs text-muted-foreground">Note: Telegram publishing requires a configured server-side webhook (see settings).</p>
+            <div className="flex items-center gap-2">
+              <input
+                id="auto-publish"
+                type="checkbox"
+                checked={!!formData.autoPublish}
+                onChange={(e) => handleChange('autoPublish', e.target.checked)}
+                className="w-4 h-4"
+              />
+              <label htmlFor="auto-publish" className="text-sm text-foreground">Auto-publish on Generate</label>
+            </div>
+
+            <p className="text-xs text-muted-foreground">Note: Telegram publishing requires a configured server-side webhook (see settings). Auto-publish will trigger once the preview is rendered.</p>
+          </div>
         </div>
       </div>
 

@@ -34,6 +34,9 @@ export interface NewsFormData {
 
   // Publishing target (only 'telegram' supported client-side for now)
   publishChannel?: 'telegram' | null;
+
+  // Auto publish when template is generated
+  autoPublish?: boolean;
 } 
 
 export interface TemplateLayout {

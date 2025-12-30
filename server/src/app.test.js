@@ -1,4 +1,6 @@
 const request = require('supertest');
+// Use ioredis-mock so tests do not require a real Redis server
+jest.mock('ioredis', () => require('ioredis-mock'));
 const { createApp } = require('./app');
 
 describe('POST /publish', () => {
@@ -24,8 +26,9 @@ describe('POST /publish', () => {
     expect(res.status).toBe(200);
     expect(res.body.queued).toBe(true);
 
-    // ensure job queue has been enqueued
-    expect(app._jobQueue.jobs.length).toBeGreaterThan(0);
+    // ensure job was enqueued (BullMQ exposes job retrieval)
+    const job = await app._publishQueue.getJob(res.body.jobId);
+    expect(job).not.toBeNull();
   });
 
   test('requires auth when secret env set', async () => {

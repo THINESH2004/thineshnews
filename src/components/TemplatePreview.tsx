@@ -211,6 +211,22 @@ export function TemplatePreview({ data, variantId, isGenerating }: TemplatePrevi
     });
   }, [data, variantId]);
 
+  // Auto-publish when rendered if requested
+  const autoPublishedRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!data || !isRendered) return;
+    if (autoPublishedRef.current === Date.now()) return; // prevent duplicates
+
+    if (data.publishChannel === 'telegram' && data.autoPublish) {
+      (async () => {
+        const r = await publishToWebhook(data.headline);
+        if (r.ok) toast.success('Auto-published to Telegram');
+        else toast.error('Auto-publish failed: ' + (r.error || 'unknown'));
+        autoPublishedRef.current = Date.now();
+      })();
+    }
+  }, [isRendered, data]);
+
   const handleDownload = () => {
     if (!canvasRef.current) return;
     
@@ -223,7 +239,47 @@ export function TemplatePreview({ data, variantId, isGenerating }: TemplatePrevi
     toast.success('Template downloaded successfully!');
   };
 
-  const handleLaunch = () => {
+  const publishToWebhook = async (caption?: string) => {
+    if (!canvasRef.current) return { ok: false, error: 'no-canvas' };
+    const endpoint = import.meta.env.VITE_TELEGRAM_API;
+    if (!endpoint) return { ok: false, error: 'no-endpoint' };
+
+    const payload = {
+      image: canvasRef.current.toDataURL('image/png'),
+      caption: sanitizeText(caption || (data?.headline || ''), 200),
+      channelTemplate: data?.channelTemplate || null,
+    };
+
+    const headers: Record<string,string> = { 'Content-Type': 'application/json' };
+    const secret = import.meta.env.VITE_TELEGRAM_SECRET;
+    if (secret) headers['x-webhook-secret'] = secret;
+
+    try {
+      const res = await fetch(endpoint, { method: 'POST', headers, body: JSON.stringify(payload) });
+      if (!res.ok) {
+        const text = await res.text();
+        return { ok: false, error: text };
+      }
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: e && (e as Error).message };
+    }
+  };
+
+  const handleLaunch = async () => {
+    if (!data) return;
+
+    // If publish target is Telegram, attempt to publish
+    if (data.publishChannel === 'telegram') {
+      const result = await publishToWebhook(data.headline);
+      if (result.ok) {
+        toast.success('Published to Telegram!');
+        return;
+      }
+      toast.error('Publish failed: ' + (result.error || 'unknown'));
+      return;
+    }
+
     toast.success('Template launched to social media!', {
       description: 'Your template has been queued for publishing.',
     });

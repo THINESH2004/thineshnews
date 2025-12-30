@@ -2071,19 +2071,52 @@ export const templateVariants: Record<NewsType, TemplateVariant[]> = {
         { id: 'subheadline', type: 'text', x: 50, y: 860, width: 1250, height: 80, style: { fontSize: 34, fontFamily: 'Roboto', color: '#eee', textAlign: 'left', maxLines: 2 }, binding: 'subHeadline' },
         { id: 'ticker', type: 'ticker', x: 0, y: 1000, width: 1920, height: 80, style: { backgroundColor: '#06b6d4', color: '#000', fontSize: 28, fontFamily: 'Roboto', fontWeight: 'bold', padding: 20 }, binding: 'description' },
       ] } },
+    // Realistic templates for other news types
+    { id: 'weather-realistic', name: 'Weather - Forecast Board', style: 'modern', layout: {
+      id: 'weather-realistic', name: 'Weather - Forecast Board', type: 'weather', width: 1920, height: 1080, backgroundColor: '#06202a', gradientOverlay: 'linear-gradient(180deg, rgba(6,182,212,0.12) 0%, rgba(0,0,0,0.8) 70%)', elements: [
+        { id: 'headline', type: 'text', x: 40, y: 40, width: 1000, height: 80, style: { fontSize: 48, fontFamily: 'Oswald', fontWeight: 'bold', color: '#fff', textAlign: 'left' }, binding: 'headline' },
+        { id: 'temp', type: 'text', x: 40, y: 140, width: 400, height: 220, style: { fontSize: 120, fontFamily: 'Oswald', fontWeight: 'bold', color: '#fff', textAlign: 'left' }, content: '28°C' },
+        { id: 'subheadline', type: 'text', x: 480, y: 160, width: 800, height: 120, style: { fontSize: 36, fontFamily: 'Roboto', color: '#ddd', textAlign: 'left' }, binding: 'subHeadline' },
+        { id: 'ticker', type: 'ticker', x: 0, y: 1000, width: 1920, height: 80, style: { backgroundColor: '#0ea5a4', color: '#000', fontSize: 26, fontFamily: 'Roboto', fontWeight: 'bold', padding: 20 }, binding: 'description' },
+      ] } },
+    { id: 'sports-realistic', name: 'Sports - Scoreboard', style: 'bold', layout: {
+      id: 'sports-realistic', name: 'Sports - Scoreboard', type: 'sports', width: 1920, height: 1080, backgroundColor: '#0b1020', gradientOverlay: 'linear-gradient(90deg, rgba(249,115,22,0.12) 0%, rgba(0,0,0,0.8) 60%)', elements: [
+        { id: 'badge', type: 'badge', x: 40, y: 40, width: 220, height: 50, style: { backgroundColor: '#f97316', color: '#fff', fontSize: 24, fontFamily: 'Bebas Neue', fontWeight: 'bold', textAlign: 'center' }, content: 'SPORTS' },
+        { id: 'teamA', type: 'text', x: 60, y: 200, width: 500, height: 120, style: { fontSize: 48, fontFamily: 'Roboto', fontWeight: 'bold', color: '#fff' }, content: 'TEAM A' },
+        { id: 'scoreA', type: 'text', x: 580, y: 200, width: 200, height: 120, style: { fontSize: 96, fontFamily: 'Oswald', fontWeight: 'bold', color: '#fff', textAlign: 'center' }, content: '2' },
+        { id: 'teamB', type: 'text', x: 820, y: 200, width: 500, height: 120, style: { fontSize: 48, fontFamily: 'Roboto', fontWeight: 'bold', color: '#fff' }, content: 'TEAM B' },
+        { id: 'scoreB', type: 'text', x: 1380, y: 200, width: 200, height: 120, style: { fontSize: 96, fontFamily: 'Oswald', fontWeight: 'bold', color: '#fff', textAlign: 'center' }, content: '1' },
+        { id: 'ticker', type: 'ticker', x: 0, y: 1000, width: 1920, height: 80, style: { backgroundColor: '#111827', color: '#fff', fontSize: 26, fontFamily: 'Roboto', fontWeight: 'bold', padding: 20 }, binding: 'description' },
+      ] } },
+    { id: 'political-realistic', name: 'Political - Lower Thirds', style: 'modern', layout: {
+      id: 'political-realistic', name: 'Political - Lower Thirds', type: 'political', width: 1920, height: 1080, backgroundColor: '#0a0b0f', gradientOverlay: 'linear-gradient(180deg, rgba(139,92,246,0.06) 0%, rgba(0,0,0,0.9) 70%)', elements: [
+        { id: 'headline', type: 'text', x: 40, y: 40, width: 1000, height: 80, style: { fontSize: 44, fontFamily: 'Oswald', fontWeight: 'bold', color: '#fff' }, binding: 'headline' },
+        { id: 'lower-third', type: 'text', x: 40, y: 860, width: 600, height: 100, style: { fontSize: 28, fontFamily: 'Roboto', color: '#fff', backgroundColor: '#111827' }, binding: 'reporterName', content: '' },
+        { id: 'ticker', type: 'ticker', x: 0, y: 1000, width: 1920, height: 80, style: { backgroundColor: '#6d28d9', color: '#fff', fontSize: 26, fontFamily: 'Roboto', fontWeight: 'bold', padding: 20 }, binding: 'description' },
+      ] } },
+    { id: 'election-realistic', name: 'Election - Results Board', style: 'bold', layout: {
+      id: 'election-realistic', name: 'Election - Results Board', type: 'election', width: 1920, height: 1080, backgroundColor: '#08101a', gradientOverlay: 'linear-gradient(180deg, rgba(234,179,8,0.06) 0%, rgba(0,0,0,0.95) 90%)', elements: [
+        { id: 'headline', type: 'text', x: 40, y: 40, width: 1600, height: 80, style: { fontSize: 56, fontFamily: 'Oswald', fontWeight: 'bold', color: '#fff' }, binding: 'headline' },
+        { id: 'resultA', type: 'text', x: 60, y: 160, width: 400, height: 120, style: { fontSize: 40, fontFamily: 'Roboto', color: '#fff' }, content: 'CAND A - 52%' },
+        { id: 'resultB', type: 'text', x: 60, y: 300, width: 400, height: 120, style: { fontSize: 40, fontFamily: 'Roboto', color: '#fff' }, content: 'CAND B - 43%' },
+        { id: 'ticker', type: 'ticker', x: 0, y: 1000, width: 1920, height: 80, style: { backgroundColor: '#111827', color: '#fff', fontSize: 26, fontFamily: 'Roboto', fontWeight: 'bold', padding: 20 }, binding: 'description' },
+      ] } },
   ],
   sports: [
     { id: 'sports-classic', name: 'Classic', style: 'classic', layout: sportsClassic },
     { id: 'sports-modern', name: 'Action Shot', style: 'modern', layout: sportsModern },
     { id: 'sports-bold', name: 'Score Board', style: 'bold', layout: sportsBold },
+    { id: 'sports-realistic', name: 'Realistic Scoreboard', style: 'bold', layout: (templateVariants.sports || [])[0]?.layout || sportsBold },
   ],
   weather: [
     { id: 'weather-classic', name: 'Classic', style: 'classic', layout: weatherClassic },
     { id: 'weather-modern', name: 'Forecast', style: 'modern', layout: weatherModern },
+    { id: 'weather-realistic', name: 'Forecast Board', style: 'modern', layout: (templateVariants.weather || [])[0]?.layout || weatherModern },
   ],
   political: [
     { id: 'political-classic', name: 'Classic', style: 'classic', layout: politicalClassic },
     { id: 'political-modern', name: 'Parliament', style: 'modern', layout: politicalModern },
+    { id: 'political-realistic', name: 'Lower Thirds', style: 'modern', layout: (templateVariants.political || [])[0]?.layout || politicalModern },
   ],
   interview: [
     { id: 'interview-classic', name: 'Classic', style: 'classic', layout: interviewClassic },

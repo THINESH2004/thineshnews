@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "ioredis-mock": "^8.13.1"
+  }
+}
