@@ -5,9 +5,10 @@ import { TemplatePreview } from '@/components/TemplatePreview';
 import { StatsPanel } from '@/components/StatsPanel';
 import { TemplateGallery } from '@/components/TemplateGallery';
 import { TelegramSettings } from '@/components/TelegramSettings';
+import { TamilAIPanel } from '@/components/TamilAIPanel';
 import { NewsFormData, NewsType } from '@/types/template';
 import { toast } from 'sonner';
-import { Sparkles, Tv2, Settings } from 'lucide-react';
+import { Sparkles, Tv2, Settings, Languages } from 'lucide-react';
 import { sanitizeText, validateNewsFormData } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -17,6 +18,8 @@ export default function Index() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [templatesGenerated, setTemplatesGenerated] = useState(0);
   const [showTelegramSettings, setShowTelegramSettings] = useState(false);
+  const [showTamilPanel, setShowTamilPanel] = useState(false);
+  const [formHeadline, setFormHeadline] = useState('');
 
   const handleGenerate = useCallback(async (data: NewsFormData, variantId: string) => {
     setIsGenerating(true);
@@ -83,15 +86,24 @@ export default function Index() {
               Replace manual Photoshop work with AI-driven template generation. 
               Create professional broadcast-quality graphics in seconds.
             </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowTelegramSettings(!showTelegramSettings)}
-              className="mt-4"
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              Telegram Settings
-            </Button>
+            <div className="flex gap-2 mt-4 justify-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowTelegramSettings(!showTelegramSettings)}
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Telegram Settings
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowTamilPanel(!showTamilPanel)}
+              >
+                <Languages className="w-4 h-4 mr-2" />
+                Tamil AI
+              </Button>
+            </div>
           </div>
         </div>
       </section>
@@ -105,6 +117,18 @@ export default function Index() {
       {showTelegramSettings && (
         <section className="container mx-auto px-6 mt-6">
           <TelegramSettings onClose={() => setShowTelegramSettings(false)} />
+        </section>
+      )}
+
+      {/* Tamil AI Panel */}
+      {showTamilPanel && (
+        <section className="container mx-auto px-6 mt-6">
+          <TamilAIPanel 
+            onSelectHeadline={(headline) => {
+              setFormHeadline(headline);
+              toast.success('Headline applied to form');
+            }} 
+          />
         </section>
       )}
 
