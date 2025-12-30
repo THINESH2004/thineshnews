@@ -4,7 +4,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Languages, Newspaper, Send, Copy, CheckCircle } from 'lucide-react';
+import { Loader2, Languages, Newspaper, Send, Copy, CheckCircle, FileText, Heading, LayoutTemplate, MessageSquare, List, ListOrdered } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -90,15 +90,29 @@ export function TamilAIPanel({ englishText = '', onSelectHeadline }: TamilAIPane
 
         <Tabs defaultValue="full" className="w-full">
           <TabsList className="grid grid-cols-4 h-auto mb-1">
-            <TabsTrigger value="full" className="text-xs py-1.5">Full</TabsTrigger>
-            <TabsTrigger value="translate" className="text-xs py-1.5">Translate</TabsTrigger>
-            <TabsTrigger value="headlines" className="text-xs py-1.5">Headlines</TabsTrigger>
-            <TabsTrigger value="template" className="text-xs py-1.5">Template</TabsTrigger>
+            <TabsTrigger value="full" className="text-xs py-1.5 gap-1">
+              <FileText className="w-3 h-3" />Full
+            </TabsTrigger>
+            <TabsTrigger value="translate" className="text-xs py-1.5 gap-1">
+              <Languages className="w-3 h-3" />Translate
+            </TabsTrigger>
+            <TabsTrigger value="headlines" className="text-xs py-1.5 gap-1">
+              <Heading className="w-3 h-3" />Headlines
+            </TabsTrigger>
+            <TabsTrigger value="template" className="text-xs py-1.5 gap-1">
+              <LayoutTemplate className="w-3 h-3" />Template
+            </TabsTrigger>
           </TabsList>
           <TabsList className="grid grid-cols-3 h-auto">
-            <TabsTrigger value="telegram" className="text-xs py-1.5">Telegram</TabsTrigger>
-            <TabsTrigger value="bullets" className="text-xs py-1.5">Bullets</TabsTrigger>
-            <TabsTrigger value="numbered" className="text-xs py-1.5">Numbered</TabsTrigger>
+            <TabsTrigger value="telegram" className="text-xs py-1.5 gap-1">
+              <MessageSquare className="w-3 h-3" />Telegram
+            </TabsTrigger>
+            <TabsTrigger value="bullets" className="text-xs py-1.5 gap-1">
+              <List className="w-3 h-3" />Bullets
+            </TabsTrigger>
+            <TabsTrigger value="numbered" className="text-xs py-1.5 gap-1">
+              <ListOrdered className="w-3 h-3" />Numbered
+            </TabsTrigger>
           </TabsList>
 
           {(['full', 'translate', 'headlines', 'template', 'telegram', 'bullets', 'numbered'] as TranslationMode[]).map((mode) => (
