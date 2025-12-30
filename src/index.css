@@ -111,6 +111,10 @@
     text-transform: uppercase;
     letter-spacing: 0.02em;
   }
+
+  body, #root {
+    background: #fff !important;
+  }
 }
 
 @layer components {
